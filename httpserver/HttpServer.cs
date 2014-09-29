@@ -11,14 +11,14 @@ namespace httpserver
     public class HttpServer
     {
         public static readonly int DefaultPort = 8888;
-        private bool _serverRunning = true;
+        private bool _serverRunning;
         
         public void StartServer()
         {
+            _serverRunning = true;
+            
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
-
-            
 
             while (_serverRunning)
             {
@@ -39,10 +39,12 @@ namespace httpserver
                 tcpClient.Close();
             }
 
-
-
             tcpListener.Stop();
+        }
 
+        public void StopServer()
+        {
+            _serverRunning = false;
         }
 
     }
