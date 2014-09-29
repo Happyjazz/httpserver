@@ -11,37 +11,36 @@ namespace httpserver
     public class HttpServer
     {
         public static readonly int DefaultPort = 8888;
-
+        private bool _serverRunning = true;
+        
         public void StartServer()
         {
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
 
-            TcpClient tcpClient = tcpListener.AcceptTcpClient();
-            Console.WriteLine("Server activated");
+            
 
-            Stream networkStream = tcpClient.GetStream();
-
-            StreamReader streamReader = new StreamReader(networkStream);
-            StreamWriter streamWriter = new StreamWriter(networkStream);
-            streamWriter.AutoFlush = true;
-
-            string message = streamReader.ReadLine();
-            string answer = "";
-
-            while (message != null && message != "")
+            while (_serverRunning)
             {
-                Console.WriteLine("Client: " + message);
-                //answer = "Message received: \"" + message + "\"";
-                answer = "Hello World";
+                TcpClient tcpClient = tcpListener.AcceptTcpClient();
+                Console.WriteLine("Server activated");
+                Stream networkStream = tcpClient.GetStream();
 
-                streamWriter.WriteLine(answer);
+                StreamReader streamReader = new StreamReader(networkStream);
+                StreamWriter streamWriter = new StreamWriter(networkStream);
+                streamWriter.AutoFlush = true;
+
+                string message = streamReader.ReadLine();
+                string answer = "";
+
+                streamWriter.WriteLine("HTTP/1.0 200 OK");
                 message = streamReader.ReadLine();
-
+                networkStream.Close();
+                tcpClient.Close();
             }
 
-            networkStream.Close();
-            tcpClient.Close();
+
+
             tcpListener.Stop();
 
         }
