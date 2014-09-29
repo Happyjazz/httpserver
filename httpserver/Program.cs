@@ -11,6 +11,9 @@ namespace httpserver
         static void Main(string[] args)
         {
             Console.WriteLine("Hello http server");
+
+            HttpServer server = new HttpServer();
+            server.StartServer();
         }
     }
 }
