@@ -15,7 +15,7 @@ namespace httpserverTest
         [TestMethod]
         public void TestGet()
         {
-            String line = GetFirstLine("GET /file.txt HTTP/1.0");
+            String line = GetFirstLine("GET /index.html HTTP/1.0");
             Assert.AreEqual("HTTP/1.0 200 OK", line);
 
             line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");

@@ -36,26 +36,35 @@ namespace httpserver
                     streamWriter.AutoFlush = true;
 
                     string message = streamReader.ReadLine();
+                    string fullFilePath = Path.Combine(_rootCatalog, GetRequestedFilePath(message));
 
-                    FileInfo fileInfo = new FileInfo(Path.Combine(_rootCatalog, GetRequestedFilePath(message)));
-
-                    streamWriter.Write(
-                        "HTTP/1.0 200 OK\r\n" +
-                        "Date: {0}\r\n" +
-                        "Server: {1}\r\n" +
-                        "MIME-version: 1.0\r\n" +
-                        "Last-Modified: {2}\r\n" +
-                        "Content-Type: text/html\r\n" +
-                        "Content-Length: {3}\r\n" +
-                        "\r\n",
-                        DateTime.Now, _serverVersion, DateTime.Now, fileInfo.Length);
-
-                    if (message != null)
+                    if (!File.Exists(fullFilePath))
                     {
-                        SendRequestedFile(GetRequestedFilePath(message), streamWriter);
+                        streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
                     }
+                    else
+                    {
+                        FileInfo fileInfo = new FileInfo(fullFilePath);
 
-                    Console.WriteLine(message);
+                        streamWriter.Write(
+                            "HTTP/1.0 200 OK\r\n" +
+                            "Date: {0}\r\n" +
+                            "Server: {1}\r\n" +
+                            "MIME-version: 1.0\r\n" +
+                            "Last-Modified: {2}\r\n" +
+                            "Content-Type: text/html\r\n" +
+                            "Content-Length: {3}\r\n" +
+                            "\r\n",
+                            DateTime.Now, _serverVersion, DateTime.Now, fileInfo.Length);
+
+                        if (message != null)
+                        {
+                            SendRequestedFile(fullFilePath, streamWriter);
+                        }
+
+                        Console.WriteLine(message);
+                    }
+                    
                     streamReader.Close();
                 }
                 catch (Exception ex)
@@ -89,7 +98,7 @@ namespace httpserver
 
         private void SendRequestedFile(string filePath, StreamWriter streamWriter)
         {
-            using (FileStream source = File.OpenRead(Path.Combine(_rootCatalog, filePath)))
+            using (FileStream source = File.OpenRead(filePath))
             {
                 byte[] bytes = new byte[1024];
                 UTF8Encoding temp = new UTF8Encoding(true);
