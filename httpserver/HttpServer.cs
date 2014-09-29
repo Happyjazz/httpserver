@@ -79,13 +79,16 @@ namespace httpserver
         private string GetRequestedFilePath(string message)
         {
             string[] messageWords = message.Split(' ');
+            string result = messageWords[1];
             
-            return messageWords[1].Trim('/');
+            result = result.Replace('/', '\\');
+            result = result.Trim('\\');
+
+            return result;
         }
 
         private void SendRequestedFile(string filePath, StreamWriter streamWriter)
         {
-
             using (FileStream source = File.OpenRead(Path.Combine(_rootCatalog, filePath)))
             {
                 byte[] bytes = new byte[1024];
