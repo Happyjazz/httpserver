@@ -14,7 +14,8 @@ namespace httpserver
     {
         public static readonly int DefaultPort = 8888;
         private bool _serverRunning;
-        private static string _serverVersion = "MartPet Server 0.1";
+        private static readonly string _serverVersion = "MartPet Server 0.1";
+        private static readonly string _rootCatalog = @"C:\temp\";
 
         public void StartServer()
         {
@@ -36,12 +37,7 @@ namespace httpserver
 
                     string message = streamReader.ReadLine();
 
-                    string returnContent = "";
-
-                    if (message != null)
-                    {
-                        returnContent = String.Format("You requested the file: {0}", GetRequestedFile(message));
-                    }
+                    FileInfo fileInfo = new FileInfo(Path.Combine(_rootCatalog, GetRequestedFilePath(message)));
 
                     streamWriter.Write(
                         "HTTP/1.0 200 OK\r\n" +
@@ -51,8 +47,14 @@ namespace httpserver
                         "Last-Modified: {2}\r\n" +
                         "Content-Type: text/html\r\n" +
                         "Content-Length: {3}\r\n" +
-                        "\r\n{4}",
-                        DateTime.Now, _serverVersion, DateTime.Now, returnContent.Length, returnContent);
+                        "\r\n",
+                        DateTime.Now, _serverVersion, DateTime.Now, fileInfo.Length);
+
+                    if (message != null)
+                    {
+                        SendRequestedFile(GetRequestedFilePath(message), streamWriter);
+                    }
+
                     Console.WriteLine(message);
                     streamReader.Close();
                 }
@@ -74,11 +76,26 @@ namespace httpserver
             _serverRunning = false;
         }
 
-        private string GetRequestedFile(string message)
+        private string GetRequestedFilePath(string message)
         {
             string[] messageWords = message.Split(' ');
             
-            return messageWords[1];
+            return messageWords[1].Trim('/');
+        }
+
+        private void SendRequestedFile(string filePath, StreamWriter streamWriter)
+        {
+
+            using (FileStream source = File.OpenRead(Path.Combine(_rootCatalog, filePath)))
+            {
+                byte[] bytes = new byte[1024];
+                UTF8Encoding temp = new UTF8Encoding(true);
+                while (source.Read(bytes,0,bytes.Length)>0)
+                {
+                    streamWriter.Write(temp.GetString(bytes));
+                    Console.WriteLine(temp.GetString(bytes));
+                }
+            }
         }
     }
 }

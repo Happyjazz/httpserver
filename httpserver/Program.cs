@@ -14,9 +14,6 @@ namespace httpserver
 
             HttpServer server = new HttpServer();
             server.StartServer();
-
-
-
         }
     }
 }
