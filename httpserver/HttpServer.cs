@@ -12,7 +12,8 @@ namespace httpserver
     {
         public static readonly int DefaultPort = 8888;
         private bool _serverRunning;
-        
+        private static string _serverVersion = "MartPet Server 0.1";
+
         public void StartServer()
         {
             _serverRunning = true;
@@ -31,10 +32,11 @@ namespace httpserver
                 streamWriter.AutoFlush = true;
 
                 string message = streamReader.ReadLine();
-                string answer = "";
 
-                streamWriter.WriteLine("HTTP/1.0 200 OK");
-                message = streamReader.ReadLine();
+                streamWriter.Write("HTTP/1.0 200 OK\r\nDate: {0}\r\nServer: {1}\r\nMIME-version: 1.0\r\nLast-Modified: {2}\r\nContent-Type: text/html\r\nContent-Length: 12\r\n\r\nHello World!", DateTime.Now, _serverVersion, DateTime.Now);
+                Console.WriteLine(message);
+                
+
                 networkStream.Close();
                 tcpClient.Close();
             }
