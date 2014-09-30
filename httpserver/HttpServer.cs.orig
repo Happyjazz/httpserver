@@ -20,16 +20,19 @@ namespace httpserver
         /// Used to define whether the server is running or not
         /// </summary>
         private bool _serverRunning;
-
+<<<<<<< HEAD
+        private const string ServerVersion = "MartPet Server 0.1";
+        private const string RootCatalog = @"C:\temp\";
+=======
         /// <summary>
         /// Used in the HTTP header response to define the server version
         /// </summary>
-        private const string ServerVersion = "MartPet Server 0.1";
-
+        private static readonly string _serverVersion = "MartPet Server 0.1";
         /// <summary>
         /// Defines where the root of the server files are stored
         /// </summary>
-        private const string RootCatalog = @"C:\temp\";
+        private static readonly string _rootCatalog = @"C:\temp\";
+>>>>>>> origin/XMLCommentary
 
         /// <summary>
         /// This method starts the HTTP listener.
@@ -44,12 +47,47 @@ namespace httpserver
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
 
-            List<Task> ServerThreads = new List<Task>();
-
             while (_serverRunning)
             {
                 TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                ServerThreads.Add(Task.Run(()=>NewConnection(tcpClient)));
+                Console.WriteLine("Server activated");
+                Stream networkStream = tcpClient.GetStream();
+                StreamReader streamReader = new StreamReader(networkStream);
+                try
+                {
+                    StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+
+                    string message = streamReader.ReadLine();
+                    string fullFilePath = Path.Combine(RootCatalog, GetRequestedFilePath(message));
+
+                    if (!File.Exists(fullFilePath))
+                    {
+                        streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
+                    }
+                    else
+                    {
+                        FileInfo fileInfo = new FileInfo(fullFilePath);
+
+                        if (message != null)
+                        {
+                            SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
+                            SendRequestedFile(fullFilePath, streamWriter);
+                        }
+
+                        Console.WriteLine(message);
+                    }
+
+                    streamReader.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    networkStream.Close();
+                    tcpClient.Close();
+                }
             }
             tcpListener.Stop();
         }
@@ -60,49 +98,6 @@ namespace httpserver
         public void StopServer()
         {
             _serverRunning = false;
-        }
-
-        private void NewConnection(TcpClient tcpClient)
-        {
-            
-            Console.WriteLine("Client connected");
-            Stream networkStream = tcpClient.GetStream();
-            StreamReader streamReader = new StreamReader(networkStream);
-
-            try
-            {
-                StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
-
-                string message = streamReader.ReadLine();
-                string fullFilePath = Path.Combine(RootCatalog, GetRequestedFilePath(message));
-
-                if (!File.Exists(fullFilePath))
-                {
-                    streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
-                }
-                else
-                {
-                    FileInfo fileInfo = new FileInfo(fullFilePath);
-
-                    if (message != null)
-                    {
-                        SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
-                        SendRequestedFile(fullFilePath, streamWriter);
-                    }
-                }
-
-                streamReader.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                networkStream.Close();
-                tcpClient.Close();
-            }
-
         }
 
         /// <summary>
@@ -135,6 +130,7 @@ namespace httpserver
                 while (source.Read(bytes, 0, bytes.Length) > 0)
                 {
                     streamWriter.Write(temp.GetString(bytes));
+                    Console.WriteLine(temp.GetString(bytes));
                 }
             }
         }
@@ -157,7 +153,5 @@ namespace httpserver
                             "\r\n",
                             DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
         }
-
-
     }
 }
