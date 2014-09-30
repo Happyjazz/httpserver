@@ -43,6 +43,7 @@ namespace httpserver
 
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
+            EventLogging.WriteToLog("Server started succesfully", "Information");
 
             List<Task> ServerThreads = new List<Task>();
 
@@ -61,6 +62,7 @@ namespace httpserver
         public void StopServer()
         {
             _serverRunning = false;
+            EventLogging.WriteToLog("Server has stopped", "Information");
         }
 
         /// <summary>
@@ -69,11 +71,12 @@ namespace httpserver
         /// <param name="tcpClient"></param>
         private void NewConnection(TcpClient tcpClient)
         {
-            
+
             Console.WriteLine("Client connected on thread " + Thread.CurrentThread.GetHashCode());
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
             StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+            EventLogging.WriteToLog("Server accepted request from client: \n" + streamReader.ReadLine(), "Information");
 
             try
             {
@@ -86,7 +89,7 @@ namespace httpserver
                
                 SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
                 SendRequestedFile(httpHeader.LocalFilePath, streamWriter);
-
+                EventLogging.WriteToLog("Send response to client", "Information");
                 streamReader.Close();
             }
             catch (Exception ex)

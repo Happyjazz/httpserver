@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,11 @@ namespace httpserver
     {
         static void Main(string[] args)
         {
+            if (!EventLog.SourceExists(EventLogging.Source))
+            {
+                EventLog.CreateEventSource(EventLogging.Source, EventLogging.logName);
+            }
+
             Console.WriteLine("Hello http server");
 
             HttpServer server = new HttpServer();
