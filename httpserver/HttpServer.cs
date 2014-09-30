@@ -80,7 +80,7 @@ namespace httpserver
                 
 
                 string httpStatusLine = streamReader.ReadLine();
-                HTTPHeader httpHeader = new HTTPHeader(httpStatusLine);
+                HttpHeader httpHeader = new HttpHeader(httpStatusLine);
 
                 FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
                

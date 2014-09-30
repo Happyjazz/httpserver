@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace httpserver
 {
-    class HTTPHeader
+    class HttpHeader
     {
         private string _function;
         private string _filePath;
@@ -52,7 +52,6 @@ namespace httpserver
                 {
                     throw new Exception("400 Illegal protocol");
                 }
-                
             }
         }
 
@@ -70,11 +69,10 @@ namespace httpserver
                 {
                     throw new Exception("404 Not Found");
                 }
-                
             }
         }
 
-        public HTTPHeader(string headerStatusLine)
+        public HttpHeader(string headerStatusLine)
         {
             string[] headerContents = headerStatusLine.Split(' ');
             Function = headerContents[0];
