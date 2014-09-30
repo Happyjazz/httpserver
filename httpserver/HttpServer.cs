@@ -30,7 +30,7 @@ namespace httpserver
         /// <summary>
         /// Defines where the root of the server files are stored
         /// </summary>
-        private const string RootCatalog = @"C:\temp\";
+        public static readonly string RootCatalog = @"C:\temp\";
 
         /// <summary>
         /// This method starts the HTTP listener.
@@ -73,34 +73,26 @@ namespace httpserver
             Console.WriteLine("Client connected on thread " + Thread.CurrentThread.GetHashCode());
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
+            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
 
             try
             {
-                StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+                
 
-                string message = streamReader.ReadLine();
-                string fullFilePath = Path.Combine(RootCatalog, GetRequestedFilePath(message));
+                string httpStatusLine = streamReader.ReadLine();
+                HTTPHeader httpHeader = new HTTPHeader(httpStatusLine);
 
-                if (!File.Exists(fullFilePath))
-                {
-                    streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
-                }
-                else
-                {
-                    FileInfo fileInfo = new FileInfo(fullFilePath);
-
-                    if (message != null)
-                    {
-                        SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
-                        SendRequestedFile(fullFilePath, streamWriter);
-                    }
-                }
+                FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
+               
+                SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
+                SendRequestedFile(httpHeader.LocalFilePath, streamWriter);
 
                 streamReader.Close();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                SendHeader(streamWriter, ex.Message);
             }
             finally
             {
@@ -126,6 +118,8 @@ namespace httpserver
 
             return result;
         }
+
+
         /// <summary>
         /// This method is used for transferring the content of a requested HTML file to a web client.
         /// </summary>
@@ -148,6 +142,7 @@ namespace httpserver
         /// This method is used to make the process of sending/writing the HTTP response easier. 
         /// </summary>
         /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
+        /// <param name="httpCode">Is used to send the HTTP status code i.e. 200 OK</param>
         /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
         /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
         private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength)
@@ -161,6 +156,15 @@ namespace httpserver
                             "Content-Length: {3}\r\n" +
                             "\r\n",
                             DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
+        }
+        private void SendHeader(StreamWriter streamWriter, string httpCode)
+        {
+            streamWriter.Write(
+                            "HTTP/1.0 {0}\r\n" +
+                            "Date: {1}\r\n" +
+                            "Server: {2}\r\n" +
+                            "\r\n",
+                            httpCode, DateTime.Now, ServerVersion);
         }
 
 
