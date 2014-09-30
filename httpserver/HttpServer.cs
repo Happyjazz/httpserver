@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -76,13 +77,12 @@ namespace httpserver
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
             StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
-            EventLogging.WriteToLog("Server accepted request from client: \n" + streamReader.ReadLine(), "Information");
 
             try
             {
-                
-
                 string httpStatusLine = streamReader.ReadLine();
+                EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
+                
                 HttpHeader httpHeader = new HttpHeader(httpStatusLine);
 
                 FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);

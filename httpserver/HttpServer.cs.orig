@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace httpserver
@@ -20,74 +21,37 @@ namespace httpserver
         /// Used to define whether the server is running or not
         /// </summary>
         private bool _serverRunning;
-<<<<<<< HEAD
-        private const string ServerVersion = "MartPet Server 0.1";
-        private const string RootCatalog = @"C:\temp\";
-=======
+
         /// <summary>
         /// Used in the HTTP header response to define the server version
         /// </summary>
-        private static readonly string _serverVersion = "MartPet Server 0.1";
+        private const string ServerVersion = "MartPet Server 0.1";
+
         /// <summary>
         /// Defines where the root of the server files are stored
         /// </summary>
-        private static readonly string _rootCatalog = @"C:\temp\";
->>>>>>> origin/XMLCommentary
+        public static readonly string RootCatalog = @"C:\temp\";
 
         /// <summary>
         /// This method starts the HTTP listener.
         /// </summary>
         /// <remarks>The HTTP server starts a TCP listener on the defined DefaultPort.
-        /// When a client connects on the DefaultPort, the received text stream is read with the StreamReader class, 
-        /// parsed and a proper response is sent back</remarks>
+        /// When a client connects on the DefaultPort a new thread is made to handle the new connection in the NewConnection method</remarks>
         public void StartServer()
         {
             _serverRunning = true;
 
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
+            EventLogging.WriteToLog("Server started succesfully", "Information");
+
+            List<Task> ServerThreads = new List<Task>();
 
             while (_serverRunning)
             {
                 TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                Console.WriteLine("Server activated");
-                Stream networkStream = tcpClient.GetStream();
-                StreamReader streamReader = new StreamReader(networkStream);
-                try
-                {
-                    StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
-
-                    string message = streamReader.ReadLine();
-                    string fullFilePath = Path.Combine(RootCatalog, GetRequestedFilePath(message));
-
-                    if (!File.Exists(fullFilePath))
-                    {
-                        streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
-                    }
-                    else
-                    {
-                        FileInfo fileInfo = new FileInfo(fullFilePath);
-
-                        if (message != null)
-                        {
-                            SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
-                            SendRequestedFile(fullFilePath, streamWriter);
-                        }
-
-                        Console.WriteLine(message);
-                    }
-
-                    streamReader.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    networkStream.Close();
-                    tcpClient.Close();
-                }
+                Task task = Task.Run(() => NewConnection(tcpClient));
+                ServerThreads.Add(task);
             }
             tcpListener.Stop();
         }
@@ -98,6 +62,72 @@ namespace httpserver
         public void StopServer()
         {
             _serverRunning = false;
+            EventLogging.WriteToLog("Server has stopped", "Information");
+        }
+
+        /// <summary>
+        /// This methods handles the incoming connections on the default port.
+        /// </summary>
+        /// <param name="tcpClient"></param>
+        private void NewConnection(TcpClient tcpClient)
+        {
+
+            Console.WriteLine("Client connected on thread " + Thread.CurrentThread.GetHashCode());
+            Stream networkStream = tcpClient.GetStream();
+            StreamReader streamReader = new StreamReader(networkStream);
+<<<<<<< HEAD
+            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+
+            try
+            {
+                
+=======
+            EventLogging.WriteToLog("Server accepted request from client: \n" + streamReader.ReadLine(), "Information");
+
+            try
+            {
+                StreamWriter streamWriter = new StreamWriter(networkStream) { AutoFlush = true };
+>>>>>>> origin/EventLogging
+
+                string httpStatusLine = streamReader.ReadLine();
+                HttpHeader httpHeader = new HttpHeader(httpStatusLine);
+
+<<<<<<< HEAD
+                FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
+               
+                SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
+                SendRequestedFile(httpHeader.LocalFilePath, streamWriter);
+
+=======
+                if (!File.Exists(fullFilePath))
+                {
+                    streamWriter.Write("HTTP/1.0 404 Not Found\r\n");
+                }
+                else
+                {
+                    FileInfo fileInfo = new FileInfo(fullFilePath);
+
+                    if (message != null)
+                    {
+                        SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
+                        SendRequestedFile(fullFilePath, streamWriter);
+                    }
+                }
+                EventLogging.WriteToLog("Send response to client", "Information");
+>>>>>>> origin/EventLogging
+                streamReader.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                SendHeader(streamWriter, ex.Message);
+            }
+            finally
+            {
+                networkStream.Close();
+                tcpClient.Close();
+            }
+
         }
 
         /// <summary>
@@ -116,6 +146,8 @@ namespace httpserver
 
             return result;
         }
+
+
         /// <summary>
         /// This method is used for transferring the content of a requested HTML file to a web client.
         /// </summary>
@@ -130,7 +162,6 @@ namespace httpserver
                 while (source.Read(bytes, 0, bytes.Length) > 0)
                 {
                     streamWriter.Write(temp.GetString(bytes));
-                    Console.WriteLine(temp.GetString(bytes));
                 }
             }
         }
@@ -139,6 +170,7 @@ namespace httpserver
         /// This method is used to make the process of sending/writing the HTTP response easier. 
         /// </summary>
         /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
+        /// <param name="httpCode">Is used to send the HTTP status code i.e. 200 OK</param>
         /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
         /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
         private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength)
@@ -153,5 +185,16 @@ namespace httpserver
                             "\r\n",
                             DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
         }
+        private void SendHeader(StreamWriter streamWriter, string httpCode)
+        {
+            streamWriter.Write(
+                            "HTTP/1.0 {0}\r\n" +
+                            "Date: {1}\r\n" +
+                            "Server: {2}\r\n" +
+                            "\r\n",
+                            httpCode, DateTime.Now, ServerVersion);
+        }
+
+
     }
 }
