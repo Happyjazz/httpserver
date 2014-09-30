@@ -46,19 +46,9 @@ namespace httpserver
                     {
                         FileInfo fileInfo = new FileInfo(fullFilePath);
 
-                        streamWriter.Write(
-                            "HTTP/1.0 200 OK\r\n" +
-                            "Date: {0}\r\n" +
-                            "Server: {1}\r\n" +
-                            "MIME-version: 1.0\r\n" +
-                            "Last-Modified: {2}\r\n" +
-                            "Content-Type: text/html\r\n" +
-                            "Content-Length: {3}\r\n" +
-                            "\r\n",
-                            DateTime.Now, _serverVersion, DateTime.Now, fileInfo.Length);
-
                         if (message != null)
                         {
+                            SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
                             SendRequestedFile(fullFilePath, streamWriter);
                         }
 
@@ -109,5 +99,20 @@ namespace httpserver
                 }
             }
         }
+
+        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength )
+        {
+            streamWriter.Write(
+                            "HTTP/1.0 200 OK\r\n" +
+                            "Date: {0}\r\n" +
+                            "Server: {1}\r\n" +
+                            "Last-Modified: {2}\r\n" +
+                            "Content-Type: text/html\r\n" +
+                            "Content-Length: {3}\r\n" +
+                            "\r\n",
+                            DateTime.Now, _serverVersion, lastModifieDateTime, contentLength);
+        }
+
+
     }
 }
