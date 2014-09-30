@@ -12,15 +12,27 @@ namespace httpserver
 {
     public class HttpServer
     {
+        /// <summary>
+        /// DefaultPort defines what port the server will listen on
+        /// </summary>
         public static readonly int DefaultPort = 8888;
+        /// <summary>
+        /// Used to define whether the server is running or not
+        /// </summary>
         private bool _serverRunning;
+        /// <summary>
+        /// Used in the HTTP header response to define the server version
+        /// </summary>
         private static readonly string _serverVersion = "MartPet Server 0.1";
+        /// <summary>
+        /// Defines where the root of the server files are stored
+        /// </summary>
         private static readonly string _rootCatalog = @"C:\temp\";
 
         public void StartServer()
         {
             _serverRunning = true;
-            
+
             TcpListener tcpListener = new TcpListener(DefaultPort);
             tcpListener.Start();
 
@@ -54,14 +66,14 @@ namespace httpserver
 
                         Console.WriteLine(message);
                     }
-                    
+
                     streamReader.Close();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
-                finally 
+                finally
                 {
                     networkStream.Close();
                     tcpClient.Close();
@@ -70,16 +82,25 @@ namespace httpserver
             tcpListener.Stop();
         }
 
+        /// <summary>
+        /// Stops the server by setting the value of the field '_serverRunning' to false
+        /// </summary>
         public void StopServer()
         {
             _serverRunning = false;
         }
 
+        /// <summary>
+        /// This method is used to split the HTTP GET request, so that we only get the URI of the requested file, 
+        /// and combine the result with the _rootCatalog field when it's used.
+        /// </summary>
+        /// <param name="message">The 'message' parameter is basically HTTP GET request send from the client</param>
+        /// <returns>Returns the HTTP GET request URI, where it's been splitted and certain characters has been replaced</returns>
         private string GetRequestedFilePath(string message)
         {
             string[] messageWords = message.Split(' ');
             string result = messageWords[1];
-            
+
             result = result.Replace('/', '\\');
             result = result.Trim('\\');
 
@@ -92,7 +113,7 @@ namespace httpserver
             {
                 byte[] bytes = new byte[1024];
                 UTF8Encoding temp = new UTF8Encoding(true);
-                while (source.Read(bytes,0,bytes.Length)>0)
+                while (source.Read(bytes, 0, bytes.Length) > 0)
                 {
                     streamWriter.Write(temp.GetString(bytes));
                     Console.WriteLine(temp.GetString(bytes));
@@ -100,7 +121,13 @@ namespace httpserver
             }
         }
 
-        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength )
+        /// <summary>
+        /// This method is used to make the process of sending/writing the HTTP response easier. 
+        /// </summary>
+        /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
+        /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
+        /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
+        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength)
         {
             streamWriter.Write(
                             "HTTP/1.0 200 OK\r\n" +
@@ -112,7 +139,5 @@ namespace httpserver
                             "\r\n",
                             DateTime.Now, _serverVersion, lastModifieDateTime, contentLength);
         }
-
-
     }
 }
