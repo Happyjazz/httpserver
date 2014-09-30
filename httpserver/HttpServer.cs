@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace httpserver
@@ -35,8 +36,7 @@ namespace httpserver
         /// This method starts the HTTP listener.
         /// </summary>
         /// <remarks>The HTTP server starts a TCP listener on the defined DefaultPort.
-        /// When a client connects on the DefaultPort, the received text stream is read with the StreamReader class, 
-        /// parsed and a proper response is sent back</remarks>
+        /// When a client connects on the DefaultPort a new thread is made to handle the new connection in the NewConnection method</remarks>
         public void StartServer()
         {
             _serverRunning = true;
@@ -49,7 +49,8 @@ namespace httpserver
             while (_serverRunning)
             {
                 TcpClient tcpClient = tcpListener.AcceptTcpClient();
-                ServerThreads.Add(Task.Run(()=>NewConnection(tcpClient)));
+                Task task = Task.Run(() => NewConnection(tcpClient));
+                ServerThreads.Add(task);
             }
             tcpListener.Stop();
         }
@@ -62,10 +63,14 @@ namespace httpserver
             _serverRunning = false;
         }
 
+        /// <summary>
+        /// This methods handles the incoming connections on the default port.
+        /// </summary>
+        /// <param name="tcpClient"></param>
         private void NewConnection(TcpClient tcpClient)
         {
             
-            Console.WriteLine("Client connected");
+            Console.WriteLine("Client connected on thread " + Thread.CurrentThread.GetHashCode());
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
 
