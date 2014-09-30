@@ -14,9 +14,15 @@ namespace httpserver
     {
         public static readonly int DefaultPort = 8888;
         private bool _serverRunning;
-        private static readonly string _serverVersion = "MartPet Server 0.1";
-        private static readonly string _rootCatalog = @"C:\temp\";
+        private const string ServerVersion = "MartPet Server 0.1";
+        private const string RootCatalog = @"C:\temp\";
 
+        /// <summary>
+        /// This method starts the HTTP listener.
+        /// </summary>
+        /// <remarks>The HTTP server starts a TCP listener on the defined DefaultPort.
+        /// When a client connects on the DefaultPort, the received text stream is read with the StreamReader class, 
+        /// parsed and a proper response is sent back</remarks>
         public void StartServer()
         {
             _serverRunning = true;
@@ -32,11 +38,10 @@ namespace httpserver
                 StreamReader streamReader = new StreamReader(networkStream);
                 try
                 {
-                    StreamWriter streamWriter = new StreamWriter(networkStream);
-                    streamWriter.AutoFlush = true;
+                    StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
 
                     string message = streamReader.ReadLine();
-                    string fullFilePath = Path.Combine(_rootCatalog, GetRequestedFilePath(message));
+                    string fullFilePath = Path.Combine(RootCatalog, GetRequestedFilePath(message));
 
                     if (!File.Exists(fullFilePath))
                     {
@@ -85,7 +90,11 @@ namespace httpserver
 
             return result;
         }
-
+        /// <summary>
+        /// This method is used for transferring the content of a requested HTML file to a web client.
+        /// </summary>
+        /// <param name="filePath">The full local path of the file to be transferred.</param>
+        /// <param name="streamWriter">The StreamWriter object used for sending the file.</param>
         private void SendRequestedFile(string filePath, StreamWriter streamWriter)
         {
             using (FileStream source = File.OpenRead(filePath))
@@ -110,7 +119,7 @@ namespace httpserver
                             "Content-Type: text/html\r\n" +
                             "Content-Length: {3}\r\n" +
                             "\r\n",
-                            DateTime.Now, _serverVersion, lastModifieDateTime, contentLength);
+                            DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
         }
 
 
