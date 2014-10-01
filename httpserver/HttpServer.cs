@@ -46,13 +46,13 @@ namespace httpserver
             tcpListener.Start();
             EventLogging.WriteToLog("Server started succesfully", "Information");
 
-            List<Task> ServerThreads = new List<Task>();
+            List<Task> serverThreads = new List<Task>();
 
             while (_serverRunning)
             {
                 TcpClient tcpClient = tcpListener.AcceptTcpClient();
                 Task task = Task.Run(() => NewConnection(tcpClient));
-                ServerThreads.Add(task);
+                serverThreads.Add(task);
             }
             tcpListener.Stop();
         }
@@ -106,24 +106,6 @@ namespace httpserver
         }
 
         /// <summary>
-        /// This method is used to split the HTTP GET request, so that we only get the URI of the requested file, 
-        /// and combine the result with the _rootCatalog field when it's used.
-        /// </summary>
-        /// <param name="message">The 'message' parameter is basically HTTP GET request send from the client</param>
-        /// <returns>Returns the HTTP GET request URI, where it's been splitted and certain characters has been replaced</returns>
-        private string GetRequestedFilePath(string message)
-        {
-            string[] messageWords = message.Split(' ');
-            string result = messageWords[1];
-
-            result = result.Replace('/', '\\');
-            result = result.Trim('\\');
-
-            return result;
-        }
-
-
-        /// <summary>
         /// This method is used for transferring the content of a requested HTML file to a web client.
         /// </summary>
         /// <param name="filePath">The full local path of the file to be transferred.</param>
@@ -145,7 +127,6 @@ namespace httpserver
         /// This method is used to make the process of sending/writing the HTTP response easier. 
         /// </summary>
         /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
-        /// <param name="httpCode">Is used to send the HTTP status code i.e. 200 OK</param>
         /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
         /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
         private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength)
@@ -160,6 +141,12 @@ namespace httpserver
                             "\r\n",
                             DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
         }
+
+        /// <summary>
+        /// Overload of the SendHeader method, for sending error codes.
+        /// </summary>
+        /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
+        /// <param name="httpCode">Is used to send the HTTP status code i.e. 200 OK</param>
         private void SendHeader(StreamWriter streamWriter, string httpCode)
         {
             streamWriter.Write(

@@ -13,7 +13,7 @@ namespace httpserver
         {
             if (!EventLog.SourceExists(EventLogging.Source))
             {
-                EventLog.CreateEventSource(EventLogging.Source, EventLogging.logName);
+                EventLog.CreateEventSource(EventLogging.Source, EventLogging.LogName);
             }
 
             Console.WriteLine("Hello http server");

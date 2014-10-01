@@ -9,26 +9,26 @@ namespace httpserver
 {
     public class EventLogging
     {
-        private const string machineName = "."; // This computer
+        private const string MachineName = "."; // This computer
         public const string Source = "MartPet HTTP Server";
-        public const string logName = "Application";
-        private const int myId = 1452;
+        public const string LogName = "Application";
+        private const int MyId = 1452;
 
         public static void WriteToLog(string logMessage, string entryType)
         {
-            using (EventLog log = new EventLog(logName, machineName, Source))
+            using (EventLog log = new EventLog(LogName, MachineName, Source))
             {
                 if (entryType == "Information")
                 {
-                    log.WriteEntry(logMessage, EventLogEntryType.Information, myId);
+                    log.WriteEntry(logMessage, EventLogEntryType.Information, MyId);
                 }
                 else if (entryType == "Error")
                 {
-                    log.WriteEntry(logMessage, EventLogEntryType.Error, myId + 1);
+                    log.WriteEntry(logMessage, EventLogEntryType.Error, MyId + 1);
                 }
                 else if (entryType == "Warning")
                 {
-                    log.WriteEntry(logMessage, EventLogEntryType.Warning, myId + 2);
+                    log.WriteEntry(logMessage, EventLogEntryType.Warning, MyId + 2);
                 }
             }
         }
