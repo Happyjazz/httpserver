@@ -89,7 +89,7 @@ namespace httpserver
                 
                
                 SendHeader(streamWriter, fileInfo.LastWriteTime,fileInfo.Length, contentTypeHandler.ContentType(httpHeader.LocalFilePath));
-                SendRequestedFile(httpHeader.LocalFilePath, streamWriter);
+                SendRequestedFile(httpHeader.LocalFilePath, networkStream);
                 EventLogging.WriteToLog("Send response to client", "Information");
                 streamReader.Close();
             }
@@ -110,17 +110,12 @@ namespace httpserver
         /// This method is used for transferring the content of a requested HTML file to a web client.
         /// </summary>
         /// <param name="filePath">The full local path of the file to be transferred.</param>
-        /// <param name="streamWriter">The StreamWriter object used for sending the file.</param>
-        private void SendRequestedFile(string filePath, StreamWriter streamWriter)
+        /// <param name="networkStream">The network stream to be used for transferring the content.</param>
+        private void SendRequestedFile(string filePath, Stream networkStream)
         {
             using (FileStream source = File.OpenRead(filePath))
             {
-                byte[] bytes = new byte[1024];
-                UTF8Encoding temp = new UTF8Encoding(true);
-                while (source.Read(bytes, 0, bytes.Length) > 0)
-                {
-                    streamWriter.Write(temp.GetString(bytes));
-                }
+                source.CopyTo(networkStream);
             }
         }
 
