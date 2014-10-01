@@ -77,6 +77,7 @@ namespace httpserver
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
             StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+            ContentTypeHandler contentTypeHandler = new ContentTypeHandler();
 
             try
             {
@@ -84,10 +85,8 @@ namespace httpserver
                 EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
                 
                 HttpRequestHeader httpHeader = new HttpRequestHeader(httpStatusLine);
-
                 FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
-
-                ContentTypeHandler contentTypeHandler = new ContentTypeHandler();
+                
                
                 SendHeader(streamWriter, fileInfo.LastWriteTime,fileInfo.Length, contentTypeHandler.ContentType(httpHeader.LocalFilePath));
                 SendRequestedFile(httpHeader.LocalFilePath, streamWriter);

@@ -11,6 +11,12 @@ namespace httpserver
     public class ContentTypeHandler
     {
         Dictionary<string, string> contentTypeDictionary = new Dictionary<string, string>(); 
+
+        /// <summary>
+        /// This method returns the content-type of a provided file.
+        /// </summary>
+        /// <param name="requestedFile">The file which are going to have its content-type returned</param>
+        /// <returns></returns>
         public string ContentType(string requestedFile)
         {
             contentTypeDictionary.Add(".html", "text/html");
@@ -28,7 +34,7 @@ namespace httpserver
 
             string extension = Path.GetExtension(requestedFile);
 
-            if (extension == " " || extension == null)
+            if (!contentTypeDictionary.ContainsKey(extension))
             {
                 return contentTypeDictionary["octet-stream"];
             }
