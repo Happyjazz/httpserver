@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpHeader.cs" />
+    <Compile Include="HttpRequestHeader.cs" />
     <Compile Include="EventLogging.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />

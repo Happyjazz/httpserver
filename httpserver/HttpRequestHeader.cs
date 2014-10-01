@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace httpserver
 {
-    class HttpHeader
+    class HttpRequestHeader
     {
         private string _function;
         private string _filePath;
@@ -35,6 +36,10 @@ namespace httpserver
             get { return _filePath; }
             set
             {
+                if (value == "/")
+                {
+                    value = "/index.html";
+                }
                 _filePath = value;
                 LocalFilePath = value;
             }
@@ -72,8 +77,13 @@ namespace httpserver
             }
         }
 
-        public HttpHeader(string headerStatusLine)
+        public HttpRequestHeader(string headerStatusLine)
         {
+            if (!ValidRequest(headerStatusLine))
+            {
+                throw new Exception("400 Illegal request");
+            }
+
             string[] headerContents = headerStatusLine.Split(' ');
             Function = headerContents[0];
             FilePath = headerContents[1];
@@ -88,6 +98,16 @@ namespace httpserver
             message = Path.Combine(HttpServer.RootCatalog, message);
 
             return message;
+        }
+
+        /// <summary>
+        /// Method that validates the format of the HTTP request header and returns a true or false.
+        /// </summary>
+        /// <param name="requestHeader">The request header to be validated</param>
+        /// <returns></returns>
+        private bool ValidRequest(string requestHeader)
+        {
+            return Regex.IsMatch(requestHeader, @"^[A-Z]*\s\/(.)*\sHTTP/\d.\d");
         }
 
 

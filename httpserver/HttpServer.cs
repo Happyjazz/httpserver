@@ -83,7 +83,7 @@ namespace httpserver
                 string httpStatusLine = streamReader.ReadLine();
                 EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
                 
-                HttpHeader httpHeader = new HttpHeader(httpStatusLine);
+                HttpRequestHeader httpHeader = new HttpRequestHeader(httpStatusLine);
 
                 FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
                
