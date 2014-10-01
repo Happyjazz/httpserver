@@ -86,8 +86,10 @@ namespace httpserver
                 HttpRequestHeader httpHeader = new HttpRequestHeader(httpStatusLine);
 
                 FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
+
+                ContentTypeHandler contentTypeHandler = new ContentTypeHandler();
                
-                SendHeader(streamWriter, fileInfo.LastWriteTime, fileInfo.Length);
+                SendHeader(streamWriter, fileInfo.LastWriteTime,fileInfo.Length, contentTypeHandler.ContentType(httpHeader.LocalFilePath));
                 SendRequestedFile(httpHeader.LocalFilePath, streamWriter);
                 EventLogging.WriteToLog("Send response to client", "Information");
                 streamReader.Close();
@@ -129,17 +131,19 @@ namespace httpserver
         /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
         /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
         /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
-        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength)
+        /// <param name="contentTypeHandler"></param>
+        /// <param name="contentType"></param>
+        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength, string contentType)
         {
             streamWriter.Write(
                             "HTTP/1.0 200 OK\r\n" +
                             "Date: {0}\r\n" +
                             "Server: {1}\r\n" +
                             "Last-Modified: {2}\r\n" +
-                            "Content-Type: text/html\r\n" +
+                            "Content-Type: {4}\r\n" +
                             "Content-Length: {3}\r\n" +
                             "\r\n",
-                            DateTime.Now, ServerVersion, lastModifieDateTime, contentLength);
+                            DateTime.Now, ServerVersion, lastModifieDateTime, contentLength, contentType);
         }
 
         /// <summary>
