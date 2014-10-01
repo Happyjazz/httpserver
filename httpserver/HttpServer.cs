@@ -82,6 +82,10 @@ namespace httpserver
             try
             {
                 string httpStatusLine = streamReader.ReadLine();
+                if (httpStatusLine == null)
+                {
+                    throw new Exception("404 Not found");
+                }
                 EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
                 
                 HttpRequestHeader httpHeader = new HttpRequestHeader(httpStatusLine);
@@ -154,7 +158,5 @@ namespace httpserver
                             "\r\n",
                             httpCode, DateTime.Now, ServerVersion);
         }
-
-
     }
 }
