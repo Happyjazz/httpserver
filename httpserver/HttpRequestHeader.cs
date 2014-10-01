@@ -16,6 +16,10 @@ namespace httpserver
         private string _httpVersion;
         private string _localFilePath;
 
+        /// <summary>
+        /// This property contains the funtion of the request.
+        /// Validation of the function is done, before assigning it to the backing field.
+        /// </summary>
         public string Function
         {
             get { return _function; }
@@ -31,6 +35,11 @@ namespace httpserver
                 }
             }
         }
+
+        /// <summary>
+        /// This property contains the URI of the requested file. 
+        /// The property checks if the root URI is provided and redirects it to index.html, if that is the case.
+        /// </summary>
         public string FilePath
         {
             get { return _filePath; }
@@ -44,6 +53,10 @@ namespace httpserver
                 LocalFilePath = value;
             }
         }
+
+        /// <summary>
+        /// This property checks if the requested HTTP version is valid, before assigning its value to the backing field.
+        /// </summary>
         public string HttpVersion
         {
             get { return _httpVersion; }
@@ -60,6 +73,10 @@ namespace httpserver
             }
         }
 
+        /// <summary>
+        /// This property contains the full local path of the requested file.
+        /// Before assigning the value to the private backing field, the property checks if the file actually exists.
+        /// </summary>
         public string LocalFilePath
         {
             get { return _localFilePath; }
@@ -77,6 +94,11 @@ namespace httpserver
             }
         }
 
+        /// <summary>
+        /// Constructor of the class that takes the request header as a parameter.
+        /// First the header validates the request and then proceeds to parse it and assign its values to the class' properties.
+        /// </summary>
+        /// <param name="headerStatusLine"></param>
         public HttpRequestHeader(string headerStatusLine)
         {
             if (!ValidRequest(headerStatusLine))
@@ -90,6 +112,11 @@ namespace httpserver
             HttpVersion = headerContents[2];
         }
 
+        /// <summary>
+        /// Method that returns the full local path of a file, by combining the URI with the RootCatalog.
+        /// </summary>
+        /// <param name="message">URI to be converted to local filepath</param>
+        /// <returns></returns>
         private string GetLocalFilePath(string message)
         {
             message = message.Replace('/', '\\');

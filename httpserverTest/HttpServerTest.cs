@@ -44,13 +44,6 @@ namespace httpserverTest
             Assert.AreEqual("HTTP/1.0 400 Illegal protocol", line);
         }
 
-        //[TestMethod]
-        //public void TestMethodNotImplemented()
-        //{
-        //    String line = GetFirstLine("POST /index.html HTTP/1.0");
-        //    Assert.AreEqual("HTTP/1.0 200 xxx", line);
-        //}
-
         /// <summary>
         /// Private helper method
         /// </summary>
