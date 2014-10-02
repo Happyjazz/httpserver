@@ -30,7 +30,7 @@ namespace httpserver
         /// <summary>
         /// Defines where the root of the server files are stored
         /// </summary>
-        public static readonly string RootCatalog = @"C:\temp\";
+        public static readonly string RootCatalog = ConfigurationManager.AppSettings["RootCatalog"];
         #endregion
 
         #region Private properties
@@ -112,6 +112,7 @@ namespace httpserver
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
 
+
             try
             {
                 string httpStatusLine = streamReader.ReadLine();
@@ -123,8 +124,16 @@ namespace httpserver
                 
                 HttpRequestHeader httpRequest = new HttpRequestHeader(httpStatusLine);
                 string localFilePath = httpRequest.LocalFilePath;
-                HttpResponse httpResponse = new HttpResponse(localFilePath);
-                httpResponse.Send(networkStream);
+
+                if (localFilePath.EndsWith("\\"))
+                {
+                    ContentCatalog.SendContentCatalog(networkStream, localFilePath);
+                }
+                else
+                {
+                    HttpResponse httpResponse = new HttpResponse(localFilePath);
+                    httpResponse.Send(networkStream);
+                }
                 
                 streamReader.Close();
             }

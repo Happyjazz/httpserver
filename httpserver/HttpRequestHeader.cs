@@ -44,17 +44,14 @@ namespace httpserver
             {
                 value = WebUtility.UrlDecode(value);
 
-                if (value == "/")
+                if (File.Exists(GetLocalFilePath(Path.Combine(value, "index.html"))))
                 {
-                    if (File.Exists(GetLocalFilePath("index.html")))
-                    {
-                        value = "/index.html";
-                        
-                    } 
-                    else if (File.Exists(GetLocalFilePath("index.htm")))
-                    {
-                        value = "/index.htm";
-                    }
+                    value = Path.Combine(value, "index.html");
+
+                }
+                else if (File.Exists(GetLocalFilePath(Path.Combine(value, "index.htm"))))
+                {
+                    value = Path.Combine(value, "index.htm");
                 }
                 _filePath = value;
                 LocalFilePath = value;
@@ -91,6 +88,9 @@ namespace httpserver
             {
                 value = GetLocalFilePath(value);
                 if (File.Exists(value))
+                {
+                    _localFilePath = value;
+                } else if (value.EndsWith("\\"))
                 {
                     _localFilePath = value;
                 }
@@ -131,7 +131,7 @@ namespace httpserver
         private string GetLocalFilePath(string message)
         {
             message = message.Replace('/', '\\');
-            message = message.Trim('\\');
+            message = message.TrimStart('\\');
 
             message = Path.Combine(HttpServer.RootCatalog, message);
 
