@@ -141,7 +141,6 @@ namespace httpserver
                 networkStream.Close();
                 tcpClient.Close();
             }
-
         }
         #endregion
     }

@@ -25,6 +25,10 @@ namespace httpserver
 
         }
 
+        /// <summary>
+        /// Method used for sending the requested file to the browser.
+        /// </summary>
+        /// <param name="networkStream">The network stream to be used for sending the file.</param>
         public void Send(Stream networkStream)
         {
             StreamWriter streamWriter = new StreamWriter(networkStream);
@@ -47,6 +51,11 @@ namespace httpserver
             EventLogging.WriteToLog("Send response to client", "Information");
         }
 
+        /// <summary>
+        /// Static method for sending headers with error codes, but no attached file.
+        /// </summary>
+        /// <param name="networkStream">The network stream that the header is sent to be sent on.</param>
+        /// <param name="httpCode">The status code to be sent in the header.</param>
         public static void SendError(Stream networkStream, string httpCode)
         {
             StreamWriter streamWriter = new StreamWriter(networkStream);
