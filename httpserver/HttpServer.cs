@@ -127,7 +127,7 @@ namespace httpserver
 
                 if (!Path.HasExtension(localFilePath) || localFilePath.EndsWith("\\"))
                 {
-                    ContentCatalog.SendContentCatalog(networkStream, localFilePath);
+                    HtmlContentCatalog.SendContentCatalog(networkStream, localFilePath);
                 }
                 else
                 {

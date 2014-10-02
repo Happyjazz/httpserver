@@ -4,7 +4,7 @@ using System.Net;
 
 namespace httpserver
 {
-    class ContentCatalog
+    class HtmlContentCatalog
     {
         /// <summary>
         /// This method creates a content catalog to show the contents of a web-directory, in case there are no welcome-file.
