@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace httpserver
 
             foreach (string file in files)
             {
-                streamWriter.Write("<LI><A HREF=\"./{0}\">{0}</A></LI>", file);
+                streamWriter.Write("<LI><A HREF=\"./{0}\">{0}</A></LI>", WebUtility.HtmlEncode(Path.GetFileName(file)));
             }
 
             streamWriter.Write("</UL></BODY></HTML>");
