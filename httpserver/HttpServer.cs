@@ -125,7 +125,7 @@ namespace httpserver
                 HttpRequestHeader httpRequest = new HttpRequestHeader(httpStatusLine);
                 string localFilePath = httpRequest.LocalFilePath;
 
-                if (localFilePath.EndsWith("\\"))
+                if (!Path.HasExtension(localFilePath) || localFilePath.EndsWith("\\"))
                 {
                     ContentCatalog.SendContentCatalog(networkStream, localFilePath);
                 }

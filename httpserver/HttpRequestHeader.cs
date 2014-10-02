@@ -90,7 +90,7 @@ namespace httpserver
                 if (File.Exists(value))
                 {
                     _localFilePath = value;
-                } else if (value.EndsWith("\\"))
+                } else if (!value.Contains("."))
                 {
                     _localFilePath = value;
                 }
