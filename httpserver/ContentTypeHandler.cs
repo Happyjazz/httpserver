@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 
 namespace httpserver
 {
     public class ContentTypeHandler
     {
-        Dictionary<string, string> contentTypeDictionary = new Dictionary<string, string>(); 
+        readonly Dictionary<string, string> _contentTypeDictionary = new Dictionary<string, string>(); 
         public static string DefaultContentType = ConfigurationManager.AppSettings["DefaultContentType"];
 
         /// <summary>
@@ -21,27 +16,27 @@ namespace httpserver
         /// <returns></returns>
         public string ContentType(string requestedFile)
         {
-            contentTypeDictionary.Add(".html", "text/html");
-            contentTypeDictionary.Add(".htm", "text/html");
-            contentTypeDictionary.Add(".gif", "image/gif");
-            contentTypeDictionary.Add(".jpg", "image/jpeg");
-            contentTypeDictionary.Add(".jpeg", "image/jpeg");
-            contentTypeDictionary.Add(".doc", "application/msword");
-            contentTypeDictionary.Add(".docx", "application/msword");
-            contentTypeDictionary.Add(".pdf", "application/pdf");
-            contentTypeDictionary.Add(".css", "text/css");
-            contentTypeDictionary.Add(".xml", "text/xml");
-            contentTypeDictionary.Add(".jar", "application/x-java-archive");
-            contentTypeDictionary.Add("octet-stream", "application/octet-stream");
+            _contentTypeDictionary.Add(".html", "text/html");
+            _contentTypeDictionary.Add(".htm", "text/html");
+            _contentTypeDictionary.Add(".gif", "image/gif");
+            _contentTypeDictionary.Add(".jpg", "image/jpeg");
+            _contentTypeDictionary.Add(".jpeg", "image/jpeg");
+            _contentTypeDictionary.Add(".doc", "application/msword");
+            _contentTypeDictionary.Add(".docx", "application/msword");
+            _contentTypeDictionary.Add(".pdf", "application/pdf");
+            _contentTypeDictionary.Add(".css", "text/css");
+            _contentTypeDictionary.Add(".xml", "text/xml");
+            _contentTypeDictionary.Add(".jar", "application/x-java-archive");
+            _contentTypeDictionary.Add("octet-stream", "application/octet-stream");
 
             string extension = Path.GetExtension(requestedFile);
 
-            if (!contentTypeDictionary.ContainsKey(extension))
+            if (!_contentTypeDictionary.ContainsKey(extension))
             {
-                return contentTypeDictionary[DefaultContentType];
+                return _contentTypeDictionary[DefaultContentType];
             }
              
-            return contentTypeDictionary[extension];
+            return _contentTypeDictionary[extension];
         }
     }
 }
