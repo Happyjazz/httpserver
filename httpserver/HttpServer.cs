@@ -19,6 +19,10 @@ namespace httpserver
         /// </summary>
         public static readonly int DefaultPort = 8888;
         /// <summary>
+        /// The port used for terminating the http-server
+        /// </summary>
+        public static readonly int KillPort = 9999;
+        /// <summary>
         /// Used to define whether the server is running or not
         /// </summary>
         private bool _serverRunning;
@@ -33,6 +37,8 @@ namespace httpserver
         /// </summary>
         public static readonly string RootCatalog = @"C:\temp\";
 
+        private List<Task> serverThreads = new List<Task>();
+
         /// <summary>
         /// This method starts the HTTP listener.
         /// </summary>
@@ -46,7 +52,7 @@ namespace httpserver
             tcpListener.Start();
             EventLogging.WriteToLog("Server started succesfully", "Information");
 
-            List<Task> serverThreads = new List<Task>();
+            
 
             while (_serverRunning)
             {
@@ -55,15 +61,37 @@ namespace httpserver
                 serverThreads.Add(task);
             }
             tcpListener.Stop();
+            EventLogging.WriteToLog("Server has stopped", "Information");
         }
 
         /// <summary>
-        /// Stops the server by setting the value of the field '_serverRunning' to false
+        /// Method for shutting down the server.
         /// </summary>
+        /// <remarks>This method is designed to be run in a parallel thread, with StartServer().
+        /// It open a listener on the port assigned to KillPort and as soon as a client connects to that port, the ShutDown() method is called.</remarks>
         public void StopServer()
         {
+            TcpListener killListener = new TcpListener(KillPort);
+            killListener.Start();
+            killListener.AcceptTcpClient();
+            killListener.Stop();
+
+            ShutDown();
+        }
+        
+        /// <summary>
+        /// Method for cleanly shutting down the server.
+        /// </summary>
+        /// <remarks>This method waits for all tasks to complete, then changes 
+        /// the _serverRunning condition to break the while-loop in StartServer() 
+        /// and then connect once more to the http server, to make sure the 
+        /// listener shuts down.</remarks>
+        private void ShutDown()
+        {
+            Task.WaitAll(serverThreads.ToArray());
             _serverRunning = false;
-            EventLogging.WriteToLog("Server has stopped", "Information");
+            TcpClient lastConnection = new TcpClient("localhost", DefaultPort);
+            lastConnection.Close();
         }
 
         /// <summary>
