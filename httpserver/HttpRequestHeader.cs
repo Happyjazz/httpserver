@@ -35,7 +35,7 @@ namespace httpserver
 
         /// <summary>
         /// This property contains the URI of the requested file. 
-        /// The property checks if the root URI is provided and redirects it to index.html, if that is the case.
+        /// The property checks if directory is provided and redirects it to index.html, if that is the case. If no index file is found, the directory is assigned as the path.
         /// </summary>
         public string FilePath
         {
@@ -79,7 +79,7 @@ namespace httpserver
 
         /// <summary>
         /// This property contains the full local path of the requested file.
-        /// Before assigning the value to the private backing field, the property checks if the file actually exists.
+        /// Before assigning the value to the private backing field, the property checks if the file actually exists or if it is a directory instead of a file.
         /// </summary>
         public string LocalFilePath
         {

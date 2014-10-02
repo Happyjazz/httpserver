@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace httpserver
 {
     class ContentCatalog
     {
+        /// <summary>
+        /// This method creates a content catalog to show the contents of a web-directory, in case there are no welcome-file.
+        /// </summary>
+        /// <param name="networkStream">Is the stream that is being used to send the data to the browser.</param>
+        /// <param name="directory">The URI that are being asked for.</param>
         public static void SendContentCatalog(Stream networkStream, string directory)
         {
             string fullDirectory = Path.Combine(HttpServer.RootCatalog, directory);
@@ -26,7 +27,7 @@ namespace httpserver
             DateTime.Now, HttpServer.ServerVersion);
 
             streamWriter.Write("<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" +
-                               "<HTML><HEAD><TITLE>Content of Directory </TITLE></HEAD>" +
+                               "<HTML><HEAD><TITLE>Content of Directory</TITLE></HEAD>" +
                                "<BODY><H1>Hi</H1><P>This is the content " +
                                "of the directory</P><UL>");
 
