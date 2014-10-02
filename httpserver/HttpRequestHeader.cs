@@ -16,6 +16,7 @@ namespace httpserver
         private string _httpVersion;
         private string _localFilePath;
 
+        #region Properties
         /// <summary>
         /// This property contains the funtion of the request.
         /// Validation of the function is done, before assigning it to the backing field.
@@ -93,7 +94,9 @@ namespace httpserver
                 }
             }
         }
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Constructor of the class that takes the request header as a parameter.
         /// First the header validates the request and then proceeds to parse it and assign its values to the class' properties.
@@ -111,7 +114,9 @@ namespace httpserver
             FilePath = headerContents[1];
             HttpVersion = headerContents[2];
         }
+        #endregion
 
+        #region Private Methods
         /// <summary>
         /// Method that returns the full local path of a file, by combining the URI with the RootCatalog.
         /// </summary>
@@ -136,7 +141,7 @@ namespace httpserver
         {
             return Regex.IsMatch(requestHeader, @"^[A-Z]*\s\/(.)*\sHTTP/\d.\d");
         }
-
+        #endregion
 
     }
 }

@@ -14,31 +14,41 @@ namespace httpserver
 {
     public class HttpServer
     {
+        #region Static properties
+        /// <summary>
+        /// Used in the HTTP header response to define the server version
+        /// </summary>
+        public static readonly string ServerVersion = "MartPet Server 0.1";
+
         /// <summary>
         /// DefaultPort defines what port the server will listen on
         /// </summary>
         public static readonly int DefaultPort = 8888;
+        
         /// <summary>
         /// The port used for terminating the http-server
         /// </summary>
         public static readonly int KillPort = 9999;
+        
+        /// <summary>
+        /// Defines where the root of the server files are stored
+        /// </summary>
+        public static readonly string RootCatalog = @"C:\temp\";
+        #endregion
+
+        #region Private properties
         /// <summary>
         /// Used to define whether the server is running or not
         /// </summary>
         private bool _serverRunning;
 
         /// <summary>
-        /// Used in the HTTP header response to define the server version
+        /// List for handling the tasks of incoming connections
         /// </summary>
-        private const string ServerVersion = "MartPet Server 0.1";
-
-        /// <summary>
-        /// Defines where the root of the server files are stored
-        /// </summary>
-        public static readonly string RootCatalog = @"C:\temp\";
-
         private List<Task> serverThreads = new List<Task>();
+        #endregion
 
+        #region Public Methods
         /// <summary>
         /// This method starts the HTTP listener.
         /// </summary>
@@ -48,11 +58,9 @@ namespace httpserver
         {
             _serverRunning = true;
 
-            TcpListener tcpListener = new TcpListener(DefaultPort);
+            TcpListener tcpListener = new TcpListener(IPAddress.Any, DefaultPort);
             tcpListener.Start();
             EventLogging.WriteToLog("Server started succesfully", "Information");
-
-            
 
             while (_serverRunning)
             {
@@ -71,14 +79,16 @@ namespace httpserver
         /// It open a listener on the port assigned to KillPort and as soon as a client connects to that port, the ShutDown() method is called.</remarks>
         public void StopServer()
         {
-            TcpListener killListener = new TcpListener(KillPort);
+            TcpListener killListener = new TcpListener(IPAddress.Any, KillPort);
             killListener.Start();
             killListener.AcceptTcpClient();
             killListener.Stop();
 
             ShutDown();
         }
-        
+        #endregion
+
+        #region Private Methods
         /// <summary>
         /// Method for cleanly shutting down the server.
         /// </summary>
@@ -157,8 +167,7 @@ namespace httpserver
         /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
         /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
         /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
-        /// <param name="contentTypeHandler"></param>
-        /// <param name="contentType"></param>
+        /// <param name="contentType">Contains the Content-type of the file being sent</param>
         private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength, string contentType)
         {
             streamWriter.Write(
@@ -186,5 +195,6 @@ namespace httpserver
                             "\r\n",
                             httpCode, DateTime.Now, ServerVersion);
         }
+        #endregion
     }
 }
