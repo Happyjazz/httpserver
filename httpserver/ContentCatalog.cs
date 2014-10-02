@@ -15,6 +15,7 @@ namespace httpserver
         {
             string fullDirectory = Path.Combine(HttpServer.RootCatalog, directory);
             string[] files = Directory.GetFiles(fullDirectory);
+            string[] folders = Directory.GetDirectories(fullDirectory);
 
             StreamWriter streamWriter = new StreamWriter(networkStream);
 
@@ -27,13 +28,20 @@ namespace httpserver
             DateTime.Now, HttpServer.ServerVersion);
 
             streamWriter.Write("<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" +
-                               "<HTML><HEAD><TITLE>Content of Directory</TITLE></HEAD>" +
+                               "<HTML><HEAD><TITLE>Content of /{0}</TITLE></HEAD>" +
                                "<BODY><H1>Hi</H1><P>This is the content " +
-                               "of the directory</P><UL>");
+                               "of the directory</P><UL>", Path.GetFileName(directory));
+
+            foreach (string folder in folders)
+            {
+                streamWriter.Write("<LI>Folder: <A HREF=\"./{0}\">{0}</A></LI>", WebUtility.HtmlEncode(Path.GetFileName(folder)));
+            }
+
+            streamWriter.Write("<BR>");
 
             foreach (string file in files)
             {
-                streamWriter.Write("<LI><A HREF=\"./{0}\">{0}</A></LI>", WebUtility.HtmlEncode(Path.GetFileName(file)));
+                streamWriter.Write("<LI>File: <A HREF=\"./{0}\">{0}</A></LI>", WebUtility.HtmlEncode(Path.GetFileName(file)));
             }
 
             streamWriter.Write("</UL></BODY></HTML>");
