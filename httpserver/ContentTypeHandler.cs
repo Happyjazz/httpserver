@@ -5,12 +5,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace httpserver
 {
     public class ContentTypeHandler
     {
         Dictionary<string, string> contentTypeDictionary = new Dictionary<string, string>(); 
+        public static string DefaultContentType = ConfigurationManager.AppSettings["DefaultContentType"];
 
         /// <summary>
         /// This method returns the content-type of a provided file.
@@ -36,7 +38,7 @@ namespace httpserver
 
             if (!contentTypeDictionary.ContainsKey(extension))
             {
-                return contentTypeDictionary["octet-stream"];
+                return contentTypeDictionary[DefaultContentType];
             }
              
             return contentTypeDictionary[extension];

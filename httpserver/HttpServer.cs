@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace httpserver
 {
@@ -23,12 +24,12 @@ namespace httpserver
         /// <summary>
         /// DefaultPort defines what port the server will listen on
         /// </summary>
-        public static readonly int DefaultPort = 8888;
+        public static readonly int DefaultPort = Convert.ToInt32(ConfigurationManager.AppSettings["DefaultPort"]);
         
         /// <summary>
         /// The port used for terminating the http-server
         /// </summary>
-        public static readonly int KillPort = 9999;
+        public static int KillPort = Convert.ToInt32(ConfigurationManager.AppSettings["KillPort"]);
         
         /// <summary>
         /// Defines where the root of the server files are stored
@@ -69,7 +70,6 @@ namespace httpserver
                 serverThreads.Add(task);
             }
             tcpListener.Stop();
-            EventLogging.WriteToLog("Server has stopped", "Information");
         }
 
         /// <summary>
@@ -102,6 +102,7 @@ namespace httpserver
             _serverRunning = false;
             TcpClient lastConnection = new TcpClient("localhost", DefaultPort);
             lastConnection.Close();
+            EventLogging.WriteToLog("Server has been shutdown", "Information");
         }
 
         /// <summary>
