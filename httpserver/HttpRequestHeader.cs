@@ -52,8 +52,12 @@ namespace httpserver
 
                 if (value == "/")
                 {
-                    value = "/index.html";
-                    if (!File.Exists(LocalFilePath))
+                    if (File.Exists(GetLocalFilePath("index.html")))
+                    {
+                        value = "/index.html";
+                        
+                    } 
+                    else if (File.Exists(GetLocalFilePath("index.htm")))
                     {
                         value = "/index.htm";
                     }
