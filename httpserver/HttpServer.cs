@@ -114,8 +114,6 @@ namespace httpserver
             Console.WriteLine("Client connected on thread " + Thread.CurrentThread.GetHashCode());
             Stream networkStream = tcpClient.GetStream();
             StreamReader streamReader = new StreamReader(networkStream);
-            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
-            ContentTypeHandler contentTypeHandler = new ContentTypeHandler();
 
             try
             {
@@ -126,19 +124,17 @@ namespace httpserver
                 }
                 EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
                 
-                HttpRequestHeader httpHeader = new HttpRequestHeader(httpStatusLine);
-                FileInfo fileInfo = new FileInfo(httpHeader.LocalFilePath);
+                HttpRequestHeader httpRequest = new HttpRequestHeader(httpStatusLine);
+                string localFilePath = httpRequest.LocalFilePath;
+                HttpResponse httpResponse = new HttpResponse(localFilePath);
+                httpResponse.Send(networkStream);
                 
-               
-                SendHeader(streamWriter, fileInfo.LastWriteTime,fileInfo.Length, contentTypeHandler.ContentType(httpHeader.LocalFilePath));
-                SendRequestedFile(httpHeader.LocalFilePath, networkStream);
-                EventLogging.WriteToLog("Send response to client", "Information");
                 streamReader.Close();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                SendHeader(streamWriter, ex.Message);
+                HttpResponse.SendError(networkStream, ex.Message);
             }
             finally
             {
@@ -146,54 +142,6 @@ namespace httpserver
                 tcpClient.Close();
             }
 
-        }
-
-        /// <summary>
-        /// This method is used for transferring the content of a requested HTML file to a web client.
-        /// </summary>
-        /// <param name="filePath">The full local path of the file to be transferred.</param>
-        /// <param name="networkStream">The network stream to be used for transferring the content.</param>
-        private void SendRequestedFile(string filePath, Stream networkStream)
-        {
-            using (FileStream source = File.OpenRead(filePath))
-            {
-                source.CopyTo(networkStream);
-            }
-        }
-
-        /// <summary>
-        /// This method is used to make the process of sending/writing the HTTP response easier. 
-        /// </summary>
-        /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
-        /// <param name="lastModifieDateTime">The lastModifiedDateTime is used to get the date the requested file was last modified</param>
-        /// <param name="contentLength">contentLength is used to 'calculate' the size of the requested file</param>
-        /// <param name="contentType">Contains the Content-type of the file being sent</param>
-        private void SendHeader(StreamWriter streamWriter, DateTime lastModifieDateTime, long contentLength, string contentType)
-        {
-            streamWriter.Write(
-                            "HTTP/1.0 200 OK\r\n" +
-                            "Date: {0}\r\n" +
-                            "Server: {1}\r\n" +
-                            "Last-Modified: {2}\r\n" +
-                            "Content-Type: {4}\r\n" +
-                            "Content-Length: {3}\r\n" +
-                            "\r\n",
-                            DateTime.Now, ServerVersion, lastModifieDateTime, contentLength, contentType);
-        }
-
-        /// <summary>
-        /// Overload of the SendHeader method, for sending error codes.
-        /// </summary>
-        /// <param name="streamWriter">The StreamWriter is used to be able to write to the socket</param>
-        /// <param name="httpCode">Is used to send the HTTP status code i.e. 200 OK</param>
-        private void SendHeader(StreamWriter streamWriter, string httpCode)
-        {
-            streamWriter.Write(
-                            "HTTP/1.0 {0}\r\n" +
-                            "Date: {1}\r\n" +
-                            "Server: {2}\r\n" +
-                            "\r\n",
-                            httpCode, DateTime.Now, ServerVersion);
         }
         #endregion
     }
