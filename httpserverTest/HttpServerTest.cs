@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using httpserver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,6 +12,14 @@ namespace httpserverTest
     public class HttpServerTest
     {
         private const string CrLf = "\r\n";
+        private static HttpServer _server;
+
+        [ClassInitialize]
+        public static void StartServer(TestContext context)
+        {
+            _server = new HttpServer();
+            Task.Factory.StartNew(_server.StartServer);
+        }
 
         [TestMethod]
         public void TestGet()
@@ -41,6 +50,12 @@ namespace httpserverTest
         {
             String line = GetFirstLine("GET /index.html HTTP/1.2");
             Assert.AreEqual("HTTP/1.0 400 Illegal protocol", line);
+        }
+
+        [ClassCleanup]
+        public static void StopServer()
+        {
+            _server.StopServer();
         }
 
         /// <summary>
