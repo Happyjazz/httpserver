@@ -69,11 +69,11 @@ namespace httpserver
         }
 
         /// <summary>
-        /// Method for shutting down the server.
+        /// Method that starts a listener on a predefined "killPort". When a connection is made to that port, the ShutDown method is invoked.
         /// </summary>
         /// <remarks>This method is designed to be run in a parallel thread, with StartServer().
         /// It open a listener on the port assigned to KillPort and as soon as a client connects to that port, the ShutDown() method is called.</remarks>
-        public void StopServer()
+        public void StopServerListener()
         {
             TcpListener killListener = new TcpListener(IPAddress.Any, KillPort);
             killListener.Start();
@@ -82,9 +82,7 @@ namespace httpserver
 
             ShutDown();
         }
-        #endregion
-
-        #region Private Methods
+        
         /// <summary>
         /// Method for cleanly shutting down the server.
         /// </summary>
@@ -92,7 +90,7 @@ namespace httpserver
         /// the _serverRunning condition to break the while-loop in StartServer() 
         /// and then connect once more to the http server, to make sure the 
         /// listener shuts down.</remarks>
-        private void ShutDown()
+        public void ShutDown()
         {
             Task.WaitAll(serverThreads.ToArray());
             _serverRunning = false;
@@ -100,7 +98,9 @@ namespace httpserver
             lastConnection.Close();
             EventLogging.WriteToLog("Server has been shutdown", "Information");
         }
+        #endregion
 
+        #region Private Methods
         /// <summary>
         /// This methods handles the incoming connections on the default port.
         /// </summary>

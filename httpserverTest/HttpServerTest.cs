@@ -52,10 +52,17 @@ namespace httpserverTest
             Assert.AreEqual("HTTP/1.0 400 Illegal protocol", line);
         }
 
+        [TestMethod]
+        public void TestMethodNotImplemented()
+        {
+            String line = GetFirstLine("POST /file.txt HTTP/1.0");
+            Assert.AreEqual("HTTP/1.0 501 Not implemented", line);
+        }
+
         [ClassCleanup]
         public static void StopServer()
         {
-            _server.StopServer();
+            _server.ShutDown();
         }
 
         /// <summary>

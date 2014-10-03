@@ -7,7 +7,7 @@ namespace httpserver
 {
     class HttpRequestHeader
     {
-        private string _function;
+        private string _method;
         private string _filePath;
         private string _httpVersion;
         private string _localFilePath;
@@ -17,16 +17,18 @@ namespace httpserver
         /// This property contains the funtion of the request.
         /// Validation of the function is done, before assigning it to the backing field.
         /// </summary>
-        public string Function
+        public string Method
         {
-            get { return _function; }
+            get { return _method; }
             set
             {
-                if (value == "GET" || value == "HEAD" || value == "POST")
+                if (value == "GET")
                 {
-                    _function = value;
-                }
-                else
+                    _method = value;
+                } else if (value == "HEAD" || value == "POST")
+                {
+                    throw new Exception("501 Not implemented");
+                } else
                 {
                     throw new Exception("400 Illegal request");
                 }
@@ -117,7 +119,7 @@ namespace httpserver
             }
 
             string[] headerContents = headerStatusLine.Split(' ');
-            Function = headerContents[0];
+            Method = headerContents[0];
             FilePath = headerContents[1];
             HttpVersion = headerContents[2];
         }

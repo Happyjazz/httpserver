@@ -19,7 +19,7 @@ namespace httpserver
 
             //Instantiation and start of the http-server
             HttpServer server = new HttpServer();
-            Parallel.Invoke(server.StartServer, server.StopServer);
+            Parallel.Invoke(server.StartServer, server.StopServerListener);
         }
     }
 }
