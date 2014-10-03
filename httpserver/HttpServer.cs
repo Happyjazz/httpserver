@@ -131,7 +131,7 @@ namespace httpserver
                 }
                 else
                 {
-                    HttpResponse httpResponse = new HttpResponse(localFilePath);
+                    HttpResponse httpResponse = new HttpResponse(localFilePath, httpRequest.Method);
                     httpResponse.Send(networkStream);
                 }
 

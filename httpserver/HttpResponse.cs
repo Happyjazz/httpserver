@@ -5,6 +5,7 @@ namespace httpserver
 {
     class HttpResponse
     {
+        public string HeaderMethod { get; set; }
         public DateTime LastModifiedDate { get; set; }
         public long ContentLength { get; set; }
         public string ContentType { get; set; }
@@ -15,12 +16,13 @@ namespace httpserver
         /// It uses FileInfo to determine the LastModifiedDate and Length of the document. It then uses the ContentTypeHandler to determine the content-type of the file.
         /// </summary>
         /// <param name="file"></param>
-        public HttpResponse(string file)
+        public HttpResponse(string file, string headerMethod)
         {
             LocalFileInfo = new FileInfo(file);
             LastModifiedDate = LocalFileInfo.LastWriteTime;
             ContentLength = LocalFileInfo.Length;
             ContentType = ContentTypeHandler.ContentType(file);
+            HeaderMethod = headerMethod;
 
         }
 
@@ -43,11 +45,13 @@ namespace httpserver
             "\r\n",
             DateTime.Now, HttpServer.ServerVersion, LastModifiedDate, ContentType, ContentLength);
 
-            using (FileStream file = File.OpenRead(LocalFileInfo.FullName))
+            if (HeaderMethod == "GET")
             {
-                file.CopyTo(networkStream);
+                using (FileStream file = File.OpenRead(LocalFileInfo.FullName))
+                {
+                    file.CopyTo(networkStream);
+                }
             }
-
             streamWriter.Close();
 
             EventLogging.WriteToLog("Send response to client", "Information");

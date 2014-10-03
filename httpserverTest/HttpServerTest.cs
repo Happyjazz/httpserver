@@ -1,7 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Net.Cache;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using httpserver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,6 +63,14 @@ namespace httpserverTest
             Assert.AreEqual("HTTP/1.0 501 Not implemented", line);
         }
 
+        [TestMethod]
+        public void TestHeadMethod()
+        {
+            String line = GetFullResponse("HEAD /index.html HTTP/1.0");
+            Assert.IsTrue(line.EndsWith("\r\n\r\n"));
+        }
+
+
         [ClassCleanup]
         public static void StopServer()
         {
@@ -86,6 +98,26 @@ namespace httpserverTest
             fromServer.Close();
             client.Close();
             return firstline;
+        }
+
+        private static String GetFullResponse(String request)
+        {
+            TcpClient client = new TcpClient("localhost", HttpServer.DefaultPort);
+            NetworkStream networkStream = client.GetStream();
+
+            StreamWriter toServer = new StreamWriter(networkStream, Encoding.UTF8);
+            toServer.Write(request + CrLf);
+            toServer.Write(CrLf);
+            toServer.Flush();
+
+            StreamReader fromServer = new StreamReader(networkStream);
+            String message = fromServer.ReadToEnd();
+
+            toServer.Close();
+            fromServer.Close();
+            client.Close();
+
+            return message;
         }
     }
 }

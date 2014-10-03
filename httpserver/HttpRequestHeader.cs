@@ -22,10 +22,10 @@ namespace httpserver
             get { return _method; }
             set
             {
-                if (value == "GET")
+                if (value == "GET" || value == "HEAD")
                 {
                     _method = value;
-                } else if (value == "HEAD" || value == "POST")
+                } else if (value == "POST")
                 {
                     throw new Exception("501 Not implemented");
                 } else
