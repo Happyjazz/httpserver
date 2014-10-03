@@ -90,7 +90,8 @@ namespace httpserver
                 if (File.Exists(value))
                 {
                     _localFilePath = value;
-                } else if (!value.Contains("."))
+                }
+                else if (!value.Contains("."))
                 {
                     _localFilePath = value;
                 }
@@ -148,6 +149,5 @@ namespace httpserver
             return Regex.IsMatch(requestHeader, @"^[A-Z]*\s\/(.)*\sHTTP/\d.\d");
         }
         #endregion
-
     }
 }
