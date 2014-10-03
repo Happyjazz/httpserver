@@ -79,7 +79,6 @@ namespace httpserverTest
             fromServer.Close();
             client.Close();
             return firstline;
-
         }
     }
 }
