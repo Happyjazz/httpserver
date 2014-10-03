@@ -17,12 +17,13 @@ namespace httpserver
         public static string ContentType(string requestedFile)
         {
             string extension = Path.GetExtension(requestedFile);
+            string result = DefaultContentType;
 
             if (ConfigurationManager.AppSettings[extension] != "")
             {
-                return ConfigurationManager.AppSettings[extension];
+                result = ConfigurationManager.AppSettings[extension];
             }
-            return DefaultContentType;
+            return result;
         }
     }
 }

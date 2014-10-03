@@ -64,6 +64,17 @@ namespace httpserverTest
         }
 
         [TestMethod]
+        public void TestContentType()
+        {
+            String fullResponse = GetFullResponse("GET /index.html HTTP/1.0");
+
+            String contentType = Regex.Match(fullResponse, @"Content-Type:\s[a-zA-Z0-1/]*").ToString();
+
+
+            Assert.AreEqual("Content-Type: text/html", contentType);
+        }
+
+        [TestMethod]
         public void TestHeadMethod()
         {
             String line = GetFullResponse("HEAD /index.html HTTP/1.0");
