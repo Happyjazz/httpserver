@@ -17,7 +17,7 @@ namespace httpserver
             string[] files = Directory.GetFiles(fullDirectory);
             string[] folders = Directory.GetDirectories(fullDirectory);
 
-            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+            StreamWriter streamWriter = new StreamWriter(networkStream) { AutoFlush = true };
 
             streamWriter.Write(
             "HTTP/1.0 200 OK\r\n" +
@@ -47,7 +47,6 @@ namespace httpserver
             streamWriter.Write("</UL></BODY></HTML>");
 
             streamWriter.Close();
-
         }
     }
 }

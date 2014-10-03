@@ -21,12 +21,12 @@ namespace httpserver
         /// DefaultPort defines what port the server will listen on
         /// </summary>
         public static readonly int DefaultPort = Convert.ToInt32(ConfigurationManager.AppSettings["DefaultPort"]);
-        
+
         /// <summary>
         /// The port used for terminating the http-server
         /// </summary>
         public static int KillPort = Convert.ToInt32(ConfigurationManager.AppSettings["KillPort"]);
-        
+
         /// <summary>
         /// Defines where the root of the server files are stored
         /// </summary>
@@ -121,7 +121,7 @@ namespace httpserver
                     throw new Exception("404 Not found");
                 }
                 EventLogging.WriteToLog("Server accepted request from client: \n" + httpStatusLine, "Information");
-                
+
                 HttpRequestHeader httpRequest = new HttpRequestHeader(httpStatusLine);
                 string localFilePath = httpRequest.LocalFilePath;
 
@@ -134,7 +134,7 @@ namespace httpserver
                     HttpResponse httpResponse = new HttpResponse(localFilePath);
                     httpResponse.Send(networkStream);
                 }
-                
+
                 streamReader.Close();
             }
             catch (Exception ex)

@@ -16,11 +16,10 @@ namespace httpserver
 
             //Welcome text for the server
             Console.WriteLine("Hello http server");
-            
+
             //Instantiation and start of the http-server
             HttpServer server = new HttpServer();
             Parallel.Invoke(server.StartServer, server.StopServer);
-            
         }
     }
 }
