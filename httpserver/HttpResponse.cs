@@ -10,19 +10,23 @@ namespace httpserver
         public string ContentType { get; set; }
         public FileInfo LocalFileInfo { get; set; }
 
+        /// <summary>
+        /// The constructor takes the full local path of the file to be sent.
+        /// It uses FileInfo to determine the LastModifiedDate and Length of the document. It then uses the ContentTypeHandler to determine the content-type of the file.
+        /// </summary>
+        /// <param name="file"></param>
         public HttpResponse(string file)
         {
-            ContentTypeHandler contentTypeHandler = new ContentTypeHandler();
-
             LocalFileInfo = new FileInfo(file);
             LastModifiedDate = LocalFileInfo.LastWriteTime;
             ContentLength = LocalFileInfo.Length;
-            ContentType = contentTypeHandler.ContentType(file);
+            ContentType = ContentTypeHandler.ContentType(file);
 
         }
 
         /// <summary>
         /// Method used for sending the requested file to the browser.
+        /// The header and body is sent in two different steps. First a streamwriter sends the header and then a filestream is used to copy the HTML-file to the networkStream.
         /// </summary>
         /// <param name="networkStream">The network stream to be used for sending the file.</param>
         public void Send(Stream networkStream)

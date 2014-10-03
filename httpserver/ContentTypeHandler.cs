@@ -10,11 +10,11 @@ namespace httpserver
         public static string DefaultContentType = ConfigurationManager.AppSettings["DefaultContentType"];
 
         /// <summary>
-        /// This method returns the content-type of a provided file.
+        /// This static method returns the content-type of a provided file.
         /// </summary>
         /// <param name="requestedFile">The file which are going to have its content-type returned</param>
         /// <returns></returns>
-        public string ContentType(string requestedFile)
+        public static string ContentType(string requestedFile)
         {
             string extension = Path.GetExtension(requestedFile);
 
