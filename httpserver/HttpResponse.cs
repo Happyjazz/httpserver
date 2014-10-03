@@ -27,8 +27,8 @@ namespace httpserver
         /// <param name="networkStream">The network stream to be used for sending the file.</param>
         public void Send(Stream networkStream)
         {
-            StreamWriter streamWriter = new StreamWriter(networkStream);
-            
+            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
+
             streamWriter.Write(
             "HTTP/1.0 200 OK\r\n" +
             "Date: {0}\r\n" +
@@ -44,6 +44,8 @@ namespace httpserver
                 file.CopyTo(networkStream);
             }
 
+            streamWriter.Close();
+
             EventLogging.WriteToLog("Send response to client", "Information");
         }
 
@@ -54,7 +56,7 @@ namespace httpserver
         /// <param name="httpCode">The status code to be sent in the header.</param>
         public static void SendError(Stream networkStream, string httpCode)
         {
-            StreamWriter streamWriter = new StreamWriter(networkStream);
+            StreamWriter streamWriter = new StreamWriter(networkStream) {AutoFlush = true};
             streamWriter.Write(
                         "HTTP/1.0 {0}\r\n" +
                         "Date: {1}\r\n" +
