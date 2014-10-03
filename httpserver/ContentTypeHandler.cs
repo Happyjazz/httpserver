@@ -6,7 +6,7 @@ namespace httpserver
 {
     public class ContentTypeHandler
     {
-        readonly Dictionary<string, string> _contentTypeDictionary = new Dictionary<string, string>(); 
+        //readonly Dictionary<string, string> _contentTypeDictionary = new Dictionary<string, string>(); 
         public static string DefaultContentType = ConfigurationManager.AppSettings["DefaultContentType"];
 
         /// <summary>
@@ -16,27 +16,13 @@ namespace httpserver
         /// <returns></returns>
         public string ContentType(string requestedFile)
         {
-            _contentTypeDictionary.Add(".html", "text/html");
-            _contentTypeDictionary.Add(".htm", "text/html");
-            _contentTypeDictionary.Add(".gif", "image/gif");
-            _contentTypeDictionary.Add(".jpg", "image/jpeg");
-            _contentTypeDictionary.Add(".jpeg", "image/jpeg");
-            _contentTypeDictionary.Add(".doc", "application/msword");
-            _contentTypeDictionary.Add(".docx", "application/msword");
-            _contentTypeDictionary.Add(".pdf", "application/pdf");
-            _contentTypeDictionary.Add(".css", "text/css");
-            _contentTypeDictionary.Add(".xml", "text/xml");
-            _contentTypeDictionary.Add(".jar", "application/x-java-archive");
-            _contentTypeDictionary.Add("octet-stream", "application/octet-stream");
-
             string extension = Path.GetExtension(requestedFile);
 
-            if (!_contentTypeDictionary.ContainsKey(extension))
+            if (ConfigurationManager.AppSettings[extension] != "")
             {
-                return _contentTypeDictionary[DefaultContentType];
+                return ConfigurationManager.AppSettings[extension];
             }
-             
-            return _contentTypeDictionary[extension];
+            return DefaultContentType;
         }
     }
 }
