@@ -8,12 +8,6 @@ namespace httpserver
     {
         static void Main(string[] args)
         {
-            //This if-sentence checks if the source-name required for logging, already exists in the windows-log
-            if (!EventLog.SourceExists(EventLogging.Source))
-            {
-                EventLog.CreateEventSource(EventLogging.Source, EventLogging.LogName);
-            }
-
             //Welcome text for the server
             Console.WriteLine("Hello http server");
 
